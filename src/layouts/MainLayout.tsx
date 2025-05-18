@@ -6,7 +6,9 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
 };
 
 MainLayout.Header = ({ children }: { children: ReactNode }) => (
-  <div className="flex h-26 w-full items-center">{children}</div>
+  <div className="flex h-20 w-full items-center border-b border-zinc-500/20">
+    {children}
+  </div>
 );
 
 MainLayout.Main = ({ children }: { children: ReactNode }) => (

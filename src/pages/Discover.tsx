@@ -37,7 +37,7 @@ const Discover = () => {
             key={genre.id || genre.genreName}
             src={genre.image}
             alt={genre.genreName}
-            className="mb-4 aspect-square w-full rounded object-contain"
+            className="mb-4 aspect-square w-full cursor-pointer rounded object-contain"
             loading="lazy"
           />
         ))}

@@ -1,5 +1,5 @@
 // search
-type PodcastResult = {
+export type PodcastResult = {
   image: string;
   score: number;
   subtitle: string;
@@ -68,6 +68,7 @@ type AdTargeting = {
   providerId: number;
 };
 
+//categories
 export type Genre = {
   id: number;
   genreGroup: string;

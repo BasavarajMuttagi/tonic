@@ -123,7 +123,7 @@ const AppHeader = () => {
             </li>
           </ul>
         </div>
-        <SearchBar placeholder="Search" onSearch={() => {}} />
+        <SearchBar placeholder="Search" />
         <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
