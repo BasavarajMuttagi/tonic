@@ -7,7 +7,7 @@ interface ApiClient {
   search: (q: string) => Promise<any>;
   podcastDetails: (id: PodcastID) => Promise<any>;
   podcastEpisodes: (id: PodcastID, limit?: number) => Promise<any>;
-  podcastsByCategory: (categoryId: CategoryID) => Promise<any>;
+  podcastsByCategoryId: (categoryId: CategoryID) => Promise<any>;
   categories: () => Promise<any>;
 }
 
@@ -42,7 +42,7 @@ const podcastClient: ApiClient = {
     ),
 
   // Get podcasts by category/genre ID
-  podcastsByCategory: (categoryId) =>
+  podcastsByCategoryId: (categoryId) =>
     fetchJson(
       `${API_BASE}/podcast/categories/${encodeURIComponent(categoryId)}`,
     ),
