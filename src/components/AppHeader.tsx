@@ -28,7 +28,8 @@ const Avatar = () => (
 
 const AppHeader = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path);
   const activeLinkClasses =
     "text-purple-400 underline underline-offset-4 decoration-purple-400 decoration-2";
 
@@ -47,21 +48,21 @@ const AppHeader = () => {
           <ul className="flex items-center gap-8">
             <li>
               <Link
-                to="/home"
+                to="/podcasts"
                 className={cn(
                   "flex items-center gap-1 text-sm",
-                  isActive("/home") && activeLinkClasses,
+                  isActive("/podcasts") && activeLinkClasses,
                   "hover:text-purple-400 hover:underline hover:decoration-purple-400 hover:decoration-2 hover:underline-offset-4",
                 )}
               >
                 <HouseIcon
                   size={24}
-                  weight={isActive("/home") ? "fill" : "regular"}
+                  weight={isActive("/podcasts") ? "fill" : "regular"}
                   className={
-                    isActive("/home") ? "text-purple-400" : "text-zinc-400"
+                    isActive("/podcasts") ? "text-purple-400" : "text-zinc-400"
                   }
                 />
-                Home
+                Podcasts
               </Link>
             </li>
             <li>

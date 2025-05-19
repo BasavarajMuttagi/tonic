@@ -34,7 +34,7 @@ const PodcastCarousel = ({ category }: { category: string | number }) => {
         {!isLoading && result?.name && (
           <header className="mb-2 flex items-center justify-between text-white">
             <Link
-              to={`/${result.id}`}
+              to={`/discover/category/${result.id}`}
               className="group flex items-center space-x-2 text-lg font-medium tracking-wide text-blue-500 hover:underline"
               aria-label={`View all podcasts in ${result.name}`}
             >
@@ -66,7 +66,9 @@ const PodcastCarousel = ({ category }: { category: string | number }) => {
                   className="basis-1/2 md:basis-1/4 lg:basis-1/5"
                 >
                   <div className="p-1">
-                    <PodcastCard podcast={podcast} />
+                    <Link to={`/podcasts/podcast/${podcast.id}`}>
+                      <PodcastCard podcast={podcast} />
+                    </Link>
                   </div>
                 </CarouselItem>
               ))
