@@ -95,6 +95,7 @@ export type PodcastEpisode = {
   startDate: number; // Unix timestamp in milliseconds
   transcriptionAvailable: boolean;
   imageUrl: string;
+  mediaUrl?: string;
   secondsPlayed?: number;
   completed?: boolean;
 };
@@ -105,4 +106,9 @@ export type PodcastEpisodesResponse = {
     next?: string;
   };
   meta: Record<string, unknown>;
+};
+
+export type PodcastEpisodeMediaResponse = {
+  episode: PodcastEpisode;
+  pageKey: string;
 };

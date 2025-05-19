@@ -1,13 +1,16 @@
 import AppHeader from "@/components/AppHeader";
+import PodcastPlayer from "@/components/PodcastPlayer";
 import { Button } from "@/components/ui/button";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
 import MainLayout from "@/layouts/MainLayout";
 import SearchResults from "@/pages/SearchResults";
+import { usePodcastStore } from "@/store";
 import { X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 const LayoutWrapper = () => {
+  const { currentEpisode } = usePodcastStore();
   const location = useLocation();
   const { isOpen, setIsOpen, setRawSearchTerm } = useSearchTerm();
   const handleReset = useCallback(() => {
@@ -41,8 +44,21 @@ const LayoutWrapper = () => {
             <SearchResults />
           </div>
         ) : (
-          <Outlet />
+          <>
+            <Outlet />
+          </>
         )}
+        <div className="fixed right-0 bottom-4 left-0 z-50 mx-auto max-w-2/3 shadow-lg">
+          {currentEpisode && (
+            <PodcastPlayer
+              bgColor="bg-zinc-900"
+              artworkUrl={currentEpisode.imageUrl}
+              audioUrl={currentEpisode.mediaUrl!}
+              episodeTitle={currentEpisode.title}
+              duration={currentEpisode.duration}
+            />
+          )}
+        </div>
       </MainLayout.Main>
     </MainLayout>
   );

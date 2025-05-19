@@ -9,6 +9,7 @@ interface ApiClient {
   podcastEpisodes: (id: PodcastID, limit?: number) => Promise<any>;
   podcastsByCategoryId: (categoryId: CategoryID) => Promise<any>;
   categories: () => Promise<any>;
+  podcastEpisodeMedia: (id: string | number) => Promise<any>;
 }
 
 async function fetchJson(url: string): Promise<any> {
@@ -49,6 +50,8 @@ const podcastClient: ApiClient = {
 
   // Get all podcast categories/genres
   categories: () => fetchJson(`${API_BASE}/catalog/genres?genreType=picker`),
+
+  podcastEpisodeMedia: (id) => fetchJson(`${API_BASE}/podcast/episodes/${id}`),
 };
 
 export default podcastClient;

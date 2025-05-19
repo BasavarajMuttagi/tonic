@@ -14,7 +14,7 @@ MainLayout.Header = ({ children }: { children: ReactNode }) => (
 MainLayout.Main = ({ children }: { children: ReactNode }) => (
   <main className="min-h-screen flex-1 overflow-auto">
     <ScrollArea className="h-full w-full">
-      <div className="flex flex-col">{children}</div>
+      <div className="mb-60 flex flex-col">{children}</div>
     </ScrollArea>
   </main>
 );
