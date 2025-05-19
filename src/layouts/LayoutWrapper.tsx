@@ -4,14 +4,24 @@ import { useSearchTerm } from "@/hooks/useSearchTerm";
 import MainLayout from "@/layouts/MainLayout";
 import SearchResults from "@/pages/SearchResults";
 import { X } from "lucide-react";
-import { Outlet } from "react-router-dom";
+import { useCallback, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 
 const LayoutWrapper = () => {
+  const location = useLocation();
   const { isOpen, setIsOpen, setRawSearchTerm } = useSearchTerm();
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setIsOpen(false);
     setRawSearchTerm("");
-  };
+  }, [setIsOpen, setRawSearchTerm]);
+
+  useEffect(() => {
+    if (isOpen) {
+      console.log("reset");
+      handleReset();
+    }
+  }, [location.pathname, setIsOpen, setRawSearchTerm, handleReset]);
+
   return (
     <MainLayout>
       <MainLayout.Header>

@@ -42,7 +42,7 @@ const Category = () => {
 
         {!isLoading &&
           result?.podcasts?.map((podcast) => (
-            <Link to={`/podcasts/podcast/${podcast.id}`}>
+            <Link to={`/podcasts/podcast/${podcast.id}`} key={podcast.id}>
               <PodcastCard podcast={podcast} />
             </Link>
           ))}

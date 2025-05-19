@@ -69,7 +69,10 @@ const SearchResults = () => {
               data.results.map((eachPodcast) => {
                 if (eachPodcast.typeName === "PODCAST") {
                   return (
-                    <Link to={`/podcasts/podcast/${eachPodcast.id}`}>
+                    <Link
+                      to={`/podcasts/podcast/${eachPodcast.id}`}
+                      key={eachPodcast.id}
+                    >
                       <SearchResultCard
                         key={eachPodcast.id}
                         podcast={eachPodcast}

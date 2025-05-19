@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 const Podcast = () => {
   const { id } = useParams();
   return (
-    <div className="h-full w-full space-y-10 flex justify-center items-center">
+    <div className="flex h-full w-full items-center justify-center space-y-10">
       <div className="container my-5">
         <PodcastDetails podcastId={id as string} />
         <div>
