@@ -32,10 +32,10 @@ export default function NotFound() {
 
             <div>
               <Link
-                to="/home"
+                to="/Podcasts"
                 className="rounded-full bg-purple-300 px-6 py-2.5 text-black transition-opacity hover:opacity-90"
               >
-                Back to Home
+                Back to Podcasts
               </Link>
             </div>
           </div>

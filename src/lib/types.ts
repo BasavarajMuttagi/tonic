@@ -81,3 +81,28 @@ export type Categories = {
   total: number;
   genres: Genre[];
 };
+
+//episodes
+export type PodcastEpisode = {
+  id: number;
+  podcastId: number;
+  podcastSlug: string;
+  title: string;
+  duration: number; // in seconds
+  isExplicit: boolean;
+  isInteractive: boolean;
+  description: string;
+  startDate: number; // Unix timestamp in milliseconds
+  transcriptionAvailable: boolean;
+  imageUrl: string;
+  secondsPlayed?: number;
+  completed?: boolean;
+};
+
+export type PodcastEpisodesResponse = {
+  data: PodcastEpisode[];
+  links: {
+    next?: string;
+  };
+  meta: Record<string, unknown>;
+};
