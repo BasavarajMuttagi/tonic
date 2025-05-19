@@ -12,7 +12,7 @@ import {
   CompassIcon,
   GearIcon,
   HeartIcon,
-  HouseIcon,
+  ApplePodcastsLogoIcon,
   SignOutIcon,
   UserIcon,
 } from "@phosphor-icons/react";
@@ -38,7 +38,7 @@ const AppHeader = () => {
       <nav className="flex h-16 w-full items-center justify-between">
         <div className="flex items-center gap-10 tracking-wider">
           <Link
-            to="/"
+            to="/podcasts"
             className="font-regular flex items-center space-x-1 text-xl"
             style={{ minWidth: "120px" }}
           >
@@ -55,7 +55,7 @@ const AppHeader = () => {
                   "hover:text-purple-400 hover:underline hover:decoration-purple-400 hover:decoration-2 hover:underline-offset-4",
                 )}
               >
-                <HouseIcon
+                <ApplePodcastsLogoIcon
                   size={24}
                   weight={isActive("/podcasts") ? "fill" : "regular"}
                   className={

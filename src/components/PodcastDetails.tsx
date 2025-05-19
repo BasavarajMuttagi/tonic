@@ -41,7 +41,7 @@ const PodcastDetails = ({ podcastId }: PodcastDetailsProps) => {
   return (
     <div>
       <p className="mb-10 text-3xl font-medium text-blue-500">
-        Podcast / <span className="text-lg text-white">{podcast.title}</span>
+        Podcast / <span className="text-lg text-white/50">{podcast.title}</span>
       </p>
       <section className="flex items-center space-x-6 rounded-lg bg-gradient-to-r from-blue-900 to-zinc-800 p-6">
         <img
@@ -59,7 +59,7 @@ const PodcastDetails = ({ podcastId }: PodcastDetailsProps) => {
             <button className="rounded-full border border-zinc-400 px-4 py-2 text-zinc-100">
               + Follow
             </button>
-            <button className="rounded-full px-2 py-2 text-zinc-400 hover:bg-zinc-700">
+            <button className="rounded-full px-2 py-2 text-zinc-400 hover:text-white">
               <ShareIcon />
             </button>
           </div>

@@ -4,6 +4,7 @@ import podcastClient from "@/lib/apiConfig";
 import type { PodcastSearchResult } from "@/lib/types";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const SearchResults = () => {
   const { searchTerm } = useSearchTerm();
@@ -39,29 +40,53 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center space-y-3">
+    <div className="my-5 flex h-full w-full flex-col items-center space-y-3">
       <div className="flex flex-col gap-10">
         {data?.bestMatch && (
           <div className="space-y-2">
             <p className="font-medium text-green-500">Top Result</p>
-            <SearchResultCard
-              key={data.bestMatch.id}
-              podcast={data.bestMatch}
-              best={true}
-            />
+            {data.bestMatch.typeName === "PODCAST" ? (
+              <Link to={`/podcasts/podcast/${data.bestMatch.id}`}>
+                <SearchResultCard
+                  key={data.bestMatch.id}
+                  podcast={data.bestMatch}
+                  best={true}
+                />
+              </Link>
+            ) : (
+              <SearchResultCard
+                key={data.bestMatch.id}
+                podcast={data.bestMatch}
+                best={true}
+              />
+            )}
           </div>
         )}
         <div className="space-y-2">
           <p className="font-medium text-blue-500">Search Results</p>
           <div className="space-y-2">
             {data?.results && data.results.length > 0 ? (
-              data.results.map((eachPodcast) => (
-                <SearchResultCard
-                  key={eachPodcast.id}
-                  podcast={eachPodcast}
-                  best={false}
-                />
-              ))
+              data.results.map((eachPodcast) => {
+                if (eachPodcast.typeName === "PODCAST") {
+                  return (
+                    <Link to={`/podcasts/podcast/${eachPodcast.id}`}>
+                      <SearchResultCard
+                        key={eachPodcast.id}
+                        podcast={eachPodcast}
+                        best={false}
+                      />
+                    </Link>
+                  );
+                }
+
+                return (
+                  <SearchResultCard
+                    key={eachPodcast.id}
+                    podcast={eachPodcast}
+                    best={false}
+                  />
+                );
+              })
             ) : (
               <div>No search results found.</div>
             )}

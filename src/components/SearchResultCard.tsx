@@ -11,7 +11,7 @@ const SearchResultCard = ({
   return (
     <div
       className={cn(
-        "dark:hover:bg-accent/60 flex h-fit min-w-2xl shrink-0 cursor-pointer items-center justify-start space-x-4 truncate overflow-hidden rounded pr-2",
+        "dark:hover:bg-accent/60 flex h-fit min-w-2xl shrink-0 cursor-pointer items-center justify-start space-x-4 truncate overflow-hidden rounded p-2 pr-2",
         best ? "dark:bg-accent" : "shadow",
       )}
     >
