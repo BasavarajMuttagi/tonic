@@ -2,7 +2,7 @@ import podcastClient from "@/lib/apiConfig";
 import type { Podcast } from "@/lib/types";
 import { ShareIcon, SpinnerGapIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
-
+import { cn } from "@/lib/utils";
 type PodcastDetailsProps = { podcastId: string };
 
 const PodcastDetails = ({ podcastId }: PodcastDetailsProps) => {
@@ -43,12 +43,19 @@ const PodcastDetails = ({ podcastId }: PodcastDetailsProps) => {
       <p className="mb-10 text-3xl font-medium text-blue-500">
         Podcast / <span className="text-lg text-white/50">{podcast.title}</span>
       </p>
-      <section className="flex items-center space-x-6 rounded-lg bg-gradient-to-r from-blue-900 to-zinc-800 p-6">
-        <img
-          src={podcast.imageUrl}
-          alt={podcast.title}
-          className="h-36 w-36 rounded object-cover shadow-lg"
-        />
+      <section
+        className={cn(
+          "flex min-h-70 items-center space-x-6 rounded-lg p-6",
+          `bg-[url(assets/bg.svg)]`,
+        )}
+      >
+        <div className="aspect-square h-36">
+          <img
+            src={podcast.imageUrl}
+            alt={podcast.title}
+            className="h-full w-full rounded object-cover shadow-lg"
+          />
+        </div>
         <div>
           <h1 className="text-3xl font-bold text-white">{podcast.title}</h1>
           <p className="mt-2 text-zinc-300">{podcast.description}</p>

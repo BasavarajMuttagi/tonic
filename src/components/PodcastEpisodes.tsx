@@ -3,6 +3,7 @@ import type { PodcastEpisodesResponse } from "@/lib/types";
 import { SpinnerGapIcon } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import PodcastEpisodeCard from "./PodcastEpisodeCard";
+import { Accordion } from "./ui/accordion";
 
 type PodcastEpisodesProps = { podcastId: string };
 
@@ -42,11 +43,13 @@ const PodcastEpisodes = ({ podcastId }: PodcastEpisodesProps) => {
   }
 
   return (
-    <div className="flex flex-col items-start space-y-4">
-      {result.data.map((episode) => (
-        <PodcastEpisodeCard key={episode.id} episode={episode} />
-      ))}
-    </div>
+    <Accordion type="single" collapsible className="w-full">
+      <div className="flex flex-col items-start space-y-4">
+        {result.data.map((episode) => (
+          <PodcastEpisodeCard key={episode.id} episode={episode} />
+        ))}
+      </div>
+    </Accordion>
   );
 };
 

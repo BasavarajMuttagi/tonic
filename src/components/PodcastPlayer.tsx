@@ -2,15 +2,13 @@ import { cn } from "@/lib/utils";
 import {
   ArrowClockwiseIcon,
   ArrowCounterClockwiseIcon,
-  InfoIcon,
   PauseIcon,
   PlayIcon,
-  ShareIcon,
   SpeakerHighIcon,
 } from "@phosphor-icons/react";
+import { CircleNotchIcon } from "@phosphor-icons/react/dist/ssr";
 import React, { useEffect, useRef, useState } from "react";
 import { Slider } from "./ui/slider";
-import { CircleNotchIcon } from "@phosphor-icons/react/dist/ssr";
 
 type PodcastPlayerProps = {
   episodeTitle: string;
@@ -40,46 +38,50 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
+  const [audioDuration, setAudioDuration] = useState(duration);
 
-  // Playback speeds to cycle through
   const playbackRates = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
 
-  // Cycle to next playback rate
-  const handlePlaybackRate = () => {
-    const currentIdx = playbackRates.indexOf(playbackRate);
-    const nextIdx = (currentIdx + 1) % playbackRates.length;
-    setPlaybackRate(playbackRates[nextIdx]);
-  };
-
-  // Handle audio loading states
   useEffect(() => {
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
 
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("canplay", handleCanPlay);
+    const handleEvents = {
+      loadstart: () => !isSeeking && setIsLoading(true),
+      canplay: () => setIsLoading(false),
+      waiting: () => !isSeeking && setIsLoading(true),
+      playing: () => setIsLoading(false),
+      durationchange: () => setAudioDuration(audio.duration),
+      seeking: () => setIsSeeking(true),
+      seeked: () => setIsSeeking(false),
+      play: () => setIsPlaying(true),
+      pause: () => setIsPlaying(false),
+      ended: () => setIsPlaying(false),
+    };
+
+    Object.entries(handleEvents).forEach(([event, handler]) => {
+      audio.addEventListener(event, handler);
+    });
 
     return () => {
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("canplay", handleCanPlay);
+      Object.entries(handleEvents).forEach(([event, handler]) => {
+        audio.removeEventListener(event, handler);
+      });
     };
-  }, [audioUrl]);
+  }, [audioUrl, isSeeking]);
 
-  // Set playback rate
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.playbackRate = playbackRate;
     }
   }, [playbackRate]);
 
-  // Handle audio URL changes with auto-play
   useEffect(() => {
     setIsPlaying(false);
     setProgress(0);
@@ -88,36 +90,27 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-
-      // Auto-play when URL changes
       const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => setIsPlaying(false));
-      }
+      playPromise?.catch(() => setIsPlaying(false));
     }
   }, [audioUrl]);
 
   const handlePlayPause = () => {
     if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+    audioRef.current.paused
+      ? audioRef.current.play()
+      : audioRef.current.pause();
   };
 
   const handleTimeUpdate = () => {
     if (!audioRef.current) return;
     setCurrentTime(audioRef.current.currentTime);
-    setProgress((audioRef.current.currentTime / duration) * 100);
+    setProgress((audioRef.current.currentTime / audioDuration) * 100);
   };
 
   const handleSeek = (value: number[]) => {
     if (!audioRef.current) return;
-    const newTime = (value[0] / 100) * duration;
+    const newTime = (value[0] / 100) * audioDuration;
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
     setProgress(value[0]);
@@ -125,11 +118,13 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 
   const handleSkip = (seconds: number) => {
     if (!audioRef.current) return;
-    let newTime = audioRef.current.currentTime + seconds;
-    newTime = Math.max(0, Math.min(duration, newTime));
+    const newTime = Math.max(
+      0,
+      Math.min(audioDuration, audioRef.current.currentTime + seconds),
+    );
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
-    setProgress((newTime / duration) * 100);
+    setProgress((newTime / audioDuration) * 100);
   };
 
   const handleVolumeChange = (value: number[]) => {
@@ -139,114 +134,103 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
     setVolume(newVolume);
   };
 
-  const textBase = "text-zinc-400 hover:text-zinc-500";
+  const handlePlaybackRate = () => {
+    const currentIdx = playbackRates.indexOf(playbackRate);
+    setPlaybackRate(playbackRates[(currentIdx + 1) % playbackRates.length]);
+  };
+
+  const iconBtn =
+    "p-2 rounded-full transition-colors text-zinc-400 hover:text-purple-600 ";
+  const mainBtn =
+    "relative size-14 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg hover:scale-105 transition-transform ";
+  const cardBg =
+    "max-w-xl mx-auto mb-8 flex items-center space-x-6 rounded-2xl border border-zinc-500/10 bg-white/80 dark:bg-zinc-900/80 p-4 inset-shadow-sm backdrop-blur-lg";
 
   return (
-    <div
-      className={cn(
-        "mb-6 flex items-center space-x-5 rounded-lg border border-zinc-200/10 p-3 shadow-lg",
-        bgColor,
-      )}
-    >
+    <div className={cn(cardBg, bgColor)}>
       <img
         src={artworkUrl}
         alt={episodeTitle}
-        className="aspect-square h-20 w-20 rounded-lg bg-blue-500 bg-gradient-to-tl to-zinc-400"
+        className="aspect-square h-24 w-24 rounded-xl border border-zinc-200/30 object-cover shadow-md"
       />
-      <div className="flex-1">
-        {/* Truncated title with Tailwind */}
-        <div
-          className={`mb-2 text-lg font-bold ${textBase} truncate overflow-hidden whitespace-nowrap`}
-        >
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="mb-2 truncate text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           {episodeTitle}
         </div>
-        <div className="flex items-center space-x-3">
+        <Slider
+          min={0}
+          max={100}
+          value={[progress]}
+          onValueChange={handleSeek}
+          className="w-full accent-purple-500"
+          aria-label="Seek"
+        />
+        <div className="mt-1 mb-3 flex items-center justify-between font-mono text-xs text-zinc-500">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(audioDuration)}</span>
+        </div>
+        <div className="flex items-center justify-between space-x-3">
           <button
-            className="relative size-12 cursor-pointer rounded-full bg-purple-400 p-2 text-white shadow"
+            className={iconBtn}
+            onClick={() => handleSkip(-15)}
+            aria-label="Skip back 15 seconds"
+          >
+            <ArrowCounterClockwiseIcon size={28} />
+          </button>
+          <button
+            className={mainBtn}
             onClick={handlePlayPause}
             aria-label={isLoading ? "Loading" : isPlaying ? "Pause" : "Play"}
             disabled={isLoading}
           >
             {isLoading ? (
               <CircleNotchIcon
-                size={48}
+                size={40}
                 weight="light"
-                className="absolute top-0 left-0 animate-spin text-zinc-200"
+                className="animate-spin"
               />
             ) : isPlaying ? (
-              <PauseIcon size={28} weight="fill" className="absolute inset-2.5 text-zinc-200" />
+              <PauseIcon size={32} weight="fill" />
             ) : (
-              <PlayIcon size={28} weight="fill" className="absolute inset-2.5 text-zinc-200" />
+              <PlayIcon size={32} weight="fill" />
             )}
           </button>
-          <Slider
-            min={0}
-            max={100}
-            value={[progress]}
-            onValueChange={handleSeek}
-            className="flex-1 border-none accent-zinc-400"
-            aria-label="Seek"
-          />
-          <span className={`text-xs ${textBase}`}>
-            {formatTime(currentTime)} | {formatTime(duration)}
-          </span>
-        </div>
-        <audio
-          ref={audioRef}
-          src={audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={() => setIsPlaying(false)}
-          preload="metadata"
-        />
-        <div className="mt-2 flex items-center justify-between space-x-4">
-          <div
-            className={`mt-2 flex items-center space-x-6 text-xs font-medium ${textBase}`}
+          <button
+            className={iconBtn}
+            onClick={() => handleSkip(15)}
+            aria-label="Skip forward 15 seconds"
           >
-            <button
-              className={textBase}
-              onClick={() => handleSkip(-15)}
-              aria-label="Skip back 15 seconds"
-            >
-              <ArrowCounterClockwiseIcon size={18} />
-            </button>
-            <button
-              className={cn(textBase, "border px-2")}
-              onClick={handlePlaybackRate}
-              aria-label="Playback speed"
-            >
-              {playbackRate}x
-            </button>
-            <button
-              className={textBase}
-              onClick={() => handleSkip(15)}
-              aria-label="Skip forward 15 seconds"
-            >
-              <ArrowClockwiseIcon size={18} />
-            </button>
-            <SpeakerHighIcon size={18} />
+            <ArrowClockwiseIcon size={28} />
+          </button>
+          <button
+            className={cn(
+              iconBtn,
+              "w-12 border border-zinc-200/60 px-3 text-center",
+            )}
+            onClick={handlePlaybackRate}
+            aria-label="Playback speed"
+          >
+            {playbackRate}x
+          </button>
+
+          <div className="ml-2 flex items-center space-x-2">
+            <SpeakerHighIcon size={22} className="text-zinc-400" />
             <Slider
               min={0}
               max={100}
               value={[volume * 100]}
               onValueChange={handleVolumeChange}
-              className="w-24 border-none accent-zinc-400"
+              className="w-20 accent-purple-500"
               aria-label="Volume"
             />
-            <button className={textBase} aria-label="Share">
-              <ShareIcon size={18} />
-            </button>
-            <button className={textBase} aria-label="More Info">
-              <InfoIcon size={18} />
-            </button>
-          </div>
-          <div
-            className={`mt-2 flex items-center space-x-6 text-xs font-medium ${textBase}`}
-          >
-            <button className="hover:underline">SUBSCRIBE</button>
-            <button className="hover:underline">SHARE</button>
-            <button className="hover:underline">MORE INFO</button>
           </div>
         </div>
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          onTimeUpdate={handleTimeUpdate}
+          preload="metadata"
+        />
       </div>
     </div>
   );
