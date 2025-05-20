@@ -45,7 +45,7 @@ const PodcastDetails = ({ podcastId }: PodcastDetailsProps) => {
       </p>
       <section
         className={cn(
-          "flex min-h-70 items-center space-x-6 rounded-lg p-6",
+          "flex min-h-70 items-center space-x-6 rounded-lg bg-top p-6",
           `bg-[url(assets/bg.svg)]`,
         )}
       >
