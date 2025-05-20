@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import React, { useEffect, useRef, useState } from "react";
 import { Slider } from "./ui/slider";
+import { CircleNotchIcon } from "@phosphor-icons/react/dist/ssr";
 
 type PodcastPlayerProps = {
   episodeTitle: string;
@@ -31,7 +32,6 @@ const formatTime = (seconds: number) => {
 
 const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
   episodeTitle,
-
   artworkUrl,
   audioUrl,
   duration,
@@ -39,30 +39,66 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
 
-  // Set playback rate when it changes
+  // Playback speeds to cycle through
+  const playbackRates = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
+
+  // Cycle to next playback rate
+  const handlePlaybackRate = () => {
+    const currentIdx = playbackRates.indexOf(playbackRate);
+    const nextIdx = (currentIdx + 1) % playbackRates.length;
+    setPlaybackRate(playbackRates[nextIdx]);
+  };
+
+  // Handle audio loading states
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    const handleLoadStart = () => setIsLoading(true);
+    const handleCanPlay = () => setIsLoading(false);
+
+    audio.addEventListener("loadstart", handleLoadStart);
+    audio.addEventListener("canplay", handleCanPlay);
+
+    return () => {
+      audio.removeEventListener("loadstart", handleLoadStart);
+      audio.removeEventListener("canplay", handleCanPlay);
+    };
+  }, [audioUrl]);
+
+  // Set playback rate
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.playbackRate = playbackRate;
     }
   }, [playbackRate]);
 
-  // Reset player when audioUrl changes
+  // Handle audio URL changes with auto-play
   useEffect(() => {
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+
+      // Auto-play when URL changes
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false));
+      }
     }
   }, [audioUrl]);
 
-  // Play/pause handler
   const handlePlayPause = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -73,14 +109,12 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
     setIsPlaying(!isPlaying);
   };
 
-  // Update progress and current time as audio plays
   const handleTimeUpdate = () => {
     if (!audioRef.current) return;
     setCurrentTime(audioRef.current.currentTime);
     setProgress((audioRef.current.currentTime / duration) * 100);
   };
 
-  // Seek handler for the slider
   const handleSeek = (value: number[]) => {
     if (!audioRef.current) return;
     const newTime = (value[0] / 100) * duration;
@@ -89,7 +123,6 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
     setProgress(value[0]);
   };
 
-  // Skip forward/backward
   const handleSkip = (seconds: number) => {
     if (!audioRef.current) return;
     let newTime = audioRef.current.currentTime + seconds;
@@ -99,7 +132,6 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
     setProgress((newTime / duration) * 100);
   };
 
-  // Volume handler
   const handleVolumeChange = (value: number[]) => {
     if (!audioRef.current) return;
     const newVolume = value[0] / 100;
@@ -112,7 +144,7 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
   return (
     <div
       className={cn(
-        "mb-6 flex items-center space-x-5 rounded-lg p-3 shadow",
+        "mb-6 flex items-center space-x-5 rounded-lg border border-zinc-200/10 p-3 shadow-lg",
         bgColor,
       )}
     >
@@ -122,16 +154,30 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
         className="aspect-square h-20 w-20 rounded-lg bg-blue-500 bg-gradient-to-tl to-zinc-400"
       />
       <div className="flex-1">
-        <div className={`mb-2 truncate text-lg font-bold ${textBase}`}>
+        {/* Truncated title with Tailwind */}
+        <div
+          className={`mb-2 text-lg font-bold ${textBase} truncate overflow-hidden whitespace-nowrap`}
+        >
           {episodeTitle}
         </div>
         <div className="flex items-center space-x-3">
           <button
-            className="rounded-full bg-purple-400 p-2 text-white shadow"
+            className="relative size-12 cursor-pointer rounded-full bg-purple-400 p-2 text-white shadow"
             onClick={handlePlayPause}
-            aria-label={isPlaying ? "Pause" : "Play"}
+            aria-label={isLoading ? "Loading" : isPlaying ? "Pause" : "Play"}
+            disabled={isLoading}
           >
-            {isPlaying ? <PauseIcon size={28} /> : <PlayIcon size={28} />}
+            {isLoading ? (
+              <CircleNotchIcon
+                size={48}
+                weight="light"
+                className="absolute top-0 left-0 animate-spin text-zinc-200"
+              />
+            ) : isPlaying ? (
+              <PauseIcon size={28} className="absolute inset-2.5" />
+            ) : (
+              <PlayIcon size={28} className="absolute inset-2.5" />
+            )}
           </button>
           <Slider
             min={0}
@@ -165,7 +211,7 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
             </button>
             <button
               className={cn(textBase, "border px-2")}
-              onClick={() => setPlaybackRate(playbackRate === 1 ? 1.5 : 1)}
+              onClick={handlePlaybackRate}
               aria-label="Playback speed"
             >
               {playbackRate}x
