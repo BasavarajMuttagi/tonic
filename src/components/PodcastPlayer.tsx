@@ -174,9 +174,9 @@ const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
                 className="absolute top-0 left-0 animate-spin text-zinc-200"
               />
             ) : isPlaying ? (
-              <PauseIcon size={28} className="absolute inset-2.5" />
+              <PauseIcon size={28} weight="fill" className="absolute inset-2.5 text-zinc-200" />
             ) : (
-              <PlayIcon size={28} className="absolute inset-2.5" />
+              <PlayIcon size={28} weight="fill" className="absolute inset-2.5 text-zinc-200" />
             )}
           </button>
           <Slider
