@@ -92,12 +92,20 @@ export type PodcastEpisode = {
   isExplicit: boolean;
   isInteractive: boolean;
   description: string;
-  startDate: number; // Unix timestamp in milliseconds
+  mediaUrl: string;
+  startDate: number; // Unix timestamp (ms)
+  endDate: number; // Unix timestamp (ms)
+  ingestionDate: number; // Unix timestamp (ms)
   transcriptionAvailable: boolean;
+  transcription: {
+    transcriptionId: number;
+    iheartGenerated: boolean;
+    languageCode: string;
+    lastUpdated: number; // Unix timestamp (s)
+    transcriptionLocation: string;
+    transcriptionType: string;
+  };
   imageUrl: string;
-  mediaUrl?: string;
-  secondsPlayed?: number;
-  completed?: boolean;
 };
 
 export type PodcastEpisodesResponse = {

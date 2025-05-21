@@ -49,15 +49,7 @@ const LayoutWrapper = () => {
           </>
         )}
         <div className="fixed right-0 bottom-4 left-0 z-50 mx-auto max-w-2/3 shadow-lg">
-          {currentEpisode && (
-            <PodcastPlayer
-              bgColor="bg-zinc-900"
-              artworkUrl={currentEpisode.imageUrl}
-              audioUrl={currentEpisode.mediaUrl!}
-              episodeTitle={currentEpisode.title}
-              duration={currentEpisode.duration}
-            />
-          )}
+          {currentEpisode && <PodcastPlayer podcastEpisode={currentEpisode} />}
         </div>
       </MainLayout.Main>
     </MainLayout>
